@@ -64,20 +64,6 @@ When online, the app can:
 - atomically swap the DB (rollback on failure)
 - open official scheme links
 
----
-
-## Dataset approach (why it’s separated from the app)
-Schemes change frequently, and state variations are common. So we treat the scheme knowledge base as a versioned artifact:
-- **dataset packs** can be updated without shipping a new app build
-- packs are validated against a schema and include metadata + checksums
-- the app shows “last updated” so users and field workers can trust freshness
-
-See:
-- [`dataset/packs/`](dataset/packs/)
-- [`dataset/schema/`](dataset/schema/)
-- [`dataset/sources/citations.md`](dataset/sources/citations.md)
-
----
 
 ## Getting started (for developers)
 ### 1) App
