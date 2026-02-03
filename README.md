@@ -32,16 +32,6 @@ BhashaSetu AI focuses on **guided scheme discovery + eligibility help + document
 
 ---
 
-## Repository layout
-- **/docs** → hackathon deliverables (requirements, design, PPT content)
-- **/app** → Android app source
-- **/dataset** → scheme packs, schemas, citations
-- **/scripts** → dataset validation + pack building utilities
-
-Start here if you’re a judge:
-- [`docs/requirements.md`](docs/requirements.md)
-- [`docs/design.md`](docs/design.md)
-- [`docs/ppt_content.md`](docs/ppt_content.md)
 
 ---
 
