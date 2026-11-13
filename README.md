@@ -65,26 +65,72 @@ When online, the app can:
 - open official scheme links
 
 
-## Getting started (for developers)
-### 1) App
-- Open `app/android/` in Android Studio
-- Build and run on a budget Android device if possible (realistic performance)
+## What is built so far
 
-Suggested test checklist:
-- airplane mode tests (offline flows)
-- low-RAM device behavior (search speed + stability)
-- speech failure fallback (clarify / switch to browse)
+This repository holds the design and the **offline matching engine**. The
+Android app, speech layer and translation are not built yet.
 
-### 2) Dataset (local)
-We store schemes in a structured format and export to SQLite for fast offline lookup.
+| Part | Status | Where |
+|---|---|---|
+| System design | Written | [`docs/design.md`](docs/design.md) |
+| Scheme pack format, validator, SQLite + FTS5 export, SHA-256 checksum (design 3.3, 3.7) | Working | `engine/bhashasetu.py` |
+| Two-stage matching with 2-3 reasons per match (design 3.4) | Working | `engine/bhashasetu.py` |
+| Eligibility answers: coarse, no identifiers (design 3.5) | Working | `engine/bhashasetu.py` |
+| Document checklist, de-duplicated across schemes (design 3.6) | Working | `engine/bhashasetu.py` |
+| Real scheme data | **Not started** | `dataset/packs/` |
+| Android app, on-device speech, translation | Not started | |
 
-Typical workflow:
-1. Put/modify scheme JSON inside `dataset/packs/sample_pack_v0.1/`
-2. Run validation (schema + sanity checks)
-3. Export SQLite database for the app
-4. Generate checksum for the pack
+**The sample pack is fictional.** Every scheme in
+`dataset/packs/sample_pack_v0.1` is a placeholder named "Sample ...", with
+`example.gov.in` links, so the engine can be tested without inventing facts
+about real schemes. A real pack must take each scheme's rules from its official
+notification and record that source in the `source` field.
 
-Scripts live in `/scripts` (details in `scripts/README.md`).
+### Try it
+
+Python 3.9+ and nothing else.
+
+```bash
+python engine/bhashasetu.py validate dataset/packs/sample_pack_v0.1
+```
+
+```bash
+python engine/bhashasetu.py export dataset/packs/sample_pack_v0.1 schemes.sqlite
+```
+
+```bash
+python engine/bhashasetu.py match schemes.sqlite --query "pension for old age" --age 64 --state KA --income below_1l --gender female --checklist
+```
+
+```text
+Sample Old-Age Pension  [Likely eligible]
+  - Your age group fits
+  - Your income is within the limit
+  - You are in a priority group
+Sample Widow Support Pension  [Check: marital_status]
+```
+
+How it decides:
+
+- **Hard rules** (age range, state, occupation, income bracket, gender, social
+  category, marital status, disability) exclude a scheme when an answer fails them.
+- **A missing answer never excludes.** The scheme is shown as "Check" with the
+  question still to ask, so the wizard knows what to ask next.
+- **Soft rules** (priority groups) only move a scheme up the list.
+- The checklist covers only the schemes marked "Likely eligible".
+
+### Tests
+
+```bash
+pip install pytest
+```
+
+```bash
+pytest
+```
+
+13 tests cover pack validation, the checksum, retrieval, every rule type,
+"ask instead of guess", the checklist and the command line.
 
 ---
 
@@ -116,7 +162,3 @@ Scripts live in `/scripts` (details in `scripts/README.md`).
 
 ## Team
 THIRD-year engineering student team — built for the AI For Bharat hackathon.
-
-Copy
-Small add-on files (optional but useful)
-If you want the repo to look “complete” on GitHub, add these lightw
